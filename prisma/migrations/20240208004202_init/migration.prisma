@@ -1,0 +1,76 @@
+// This is your Prisma migration file.
+// Learn more about Prisma migrations at https://pris.ly/d/migrations
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(auto())
+  email     String   @unique
+  name      String
+  image     String?
+  password  String
+  createdAt DateTime @default(now())
+  goals     Goal[]
+  workouts  Workout[]
+  meals     Meal[]
+  friends   User[]  @relation("Friends")
+  friendRequests FriendRequest[]
+  socialUpdates SocialUpdate[]
+}
+
+model Goal {
+  id        Int      @id @default(auto())
+  type      String
+  target     Int
+  progress   Int?
+  timeline   DateTime
+  description String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model Workout {
+  id              Int      @id @default(auto())
+  workoutType     String
+  duration        Int
+  intensity      String
+  caloriesBurned   Int
+  date            DateTime @default(now())
+  description     String?
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
+}
+
+model Meal {
+  id              Int      @id @default(auto())
+  foodName        String
+  foodCalories     Int
+  date            DateTime @default(now())
+  description     String?
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
+}
+
+model FriendRequest {
+  id          Int      @id @default(auto())
+  senderId    Int
+  receiverId  Int
+  sender      User     @relation(fields: [senderId], references: [id])
+  receiver    User     @relation(fields: [receiverId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model SocialUpdate {
+  id        Int      @id @default(auto())
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
